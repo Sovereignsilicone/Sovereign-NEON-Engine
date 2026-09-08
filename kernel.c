@@ -8,8 +8,14 @@ extern void sovereign_neon_matmul_fp16(const uint16_t *restrict weights, const u
 extern void sovereign_cache_prefetch(const void *addr);
 extern void sovereign_timer_init(uint32_t interval_ticks);
 
+// إعلان الدالة القادمة من وحدة low_level.c للوصول المباشر للعتاد وعدّادات الأداء
+extern void low_level_kernel_entry(void);
+
 // حلقة التشغيل الرئيسية المطلقة (Bare-Metal Core Entry)
 void main(void) {
+    // تفعيل فحص العتاد والقياس اللحظي لدورات المعالج عند الإقلاع المباشر
+    low_level_kernel_entry();
+
     // تهيئة المؤقت السيادي وتحديد فاصل النبضات الدورية لتوليد مقاطعات منتظمة
     sovereign_timer_init(0x500000);
 
@@ -33,7 +39,7 @@ void main(void) {
         sovereign_memory_clean(mock_inputs, 64);
     }
 
-    // قفل المعالج في حلقة خمول آمنة بانتظار مقاطعات الهاردوير والمؤقت
+    // قفل المعالج في حلقة خمول آمنة بانتظار مقاطعات الهاردوير والمؤقت مع ضمان حواجز الذاكرة
     while (1) {
         __asm__ __volatile__("wfi\n\tisb" ::: "memory");
     }
