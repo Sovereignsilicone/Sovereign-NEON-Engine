@@ -1,5 +1,4 @@
 # Sovereign-NEON-Engine
-# Sovereign-NEON-Engine
 
 A production-grade, bare-metal ARMv8-A microkernel framework engineered for absolute hardware control, zero-copy NEON vectorization, timer-driven preemptive multitasking, and hardware-level AI inference optimization.
 
