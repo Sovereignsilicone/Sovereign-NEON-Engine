@@ -79,6 +79,24 @@ sovereign_context_switch_restore:
     add sp, sp, #272
     eret
 
+/*
+ * إعدادات السيليكون السيادي ومستويات الامتياز العالية (EL3 / TrustZone & MTE Initialization)
+ */
+.global sovereign_security_init
+sovereign_security_init:
+    // تهيئة بيئة التشغيل الآمنة وضبط سجل التحكم في مستوى الامتياز الأعلى SCR_EL3
+    // السماح بالوصول إلى عالم Non-secure وتفعيل نظام AArch64
+    mov     x0, #(1 << 10)     // RW bit (Execution state for lower level is AArch64)
+    orr     x0, x0, #(1 << 0)  // NS bit (Non-secure EL0/EL1)
+    msr     scr_el3, x0
+
+    // تهيئة بيئة Hypervisor والتحكم في المحاكاة الافتراضية عبر HCR_EL2
+    mov     x0, #(1 << 31)     // RW bit (EL1 is AArch64)
+    msr     hcr_el2, x0
+
+    isb
+    ret
+
 .section .bss
 .align 16
 stack_bottom:
